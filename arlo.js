@@ -202,7 +202,7 @@ function arlo(config) {
 
             es.addEventListener('message', function (e) {
                 subs.call( JSON.parse(e.data));
-                console.log(e.data)
+                //console.log(e.data)
             });
 
         });
