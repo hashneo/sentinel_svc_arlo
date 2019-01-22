@@ -1,0 +1,251 @@
+---
+swagger: '2.0'
+info:
+  description: ''
+  version: '0.0.1'
+  title: 'data'
+  termsOfService: ''
+  contact:
+    name: ''
+    url: ''
+    email: 'steven.taylor@me.com'
+  license:
+    name: 'Steven Taylor'
+host: localhost
+basePath: /
+schemes:
+- https
+consumes:
+- application/json
+produces:
+- application/json
+
+securityDefinitions:
+  Oauth:
+    type: oauth2
+    scopes:
+      open: no security
+      user: a user
+    flow: implicit
+    authorizationUrl: https://my_aouth/
+
+security:
+- Oauth: []
+
+paths:
+  /health:
+    x-swagger-router-controller: health
+    get:
+      tags:
+      - health
+      operationId: health
+      security:
+      - Oauth:
+        - open
+      parameters:
+      - in: query
+        name: id
+        type: string
+      responses:
+        200:
+          description: health information
+          schema:
+            $ref: '#/definitions/Status'
+
+        default:
+          $ref: '#/responses/Error'
+
+  /reload:
+    x-swagger-router-controller: system
+    get:
+      operationId: Reload
+      security:
+      - Oauth:
+        - user
+      responses:
+        200:
+          description: ok
+          schema:
+            type: object
+        default:
+          $ref: '#/responses/Error'
+
+  /devices:
+    x-swagger-router-controller: system
+    get:
+      operationId: getDevices
+      security:
+      - Oauth:
+        - user
+      responses:
+        200:
+          description: ok
+          schema:
+            type: object
+        default:
+          $ref: '#/responses/Error'
+
+  /device/{id}/status:
+    x-swagger-router-controller: system
+    get:
+      operationId: getDeviceStatus
+      security:
+      - Oauth:
+        - user
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            type: object
+        default:
+          $ref: '#/responses/Error'
+
+  /camera/{id}/detection/{mode}/{state}:
+    x-swagger-router-controller: camera
+    get:
+      operationId: setCameraArmedMode
+      security:
+      - Oauth:
+        - user
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: path
+        name: mode
+        required: true
+        type: string
+        enum: [
+          line,
+          field,
+          motion
+        ]
+      - in: path
+        name: state
+        required: true
+        type: string
+        enum: [
+          enable,
+          disable
+        ]
+      responses:
+        200:
+          description: ok
+          schema:
+            type: object
+        default:
+          $ref: '#/responses/Error'
+
+  /camera/{id}/image:
+    x-swagger-router-controller: camera
+    get:
+      operationId: getCameraImage
+      produces:
+      - image/jpeg
+      security:
+      - Oauth:
+        - user
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: query
+        name: width
+        type: string
+      - in: query
+        name: height
+        type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            type: string
+            format: byte
+        default:
+          $ref: '#/responses/Error'
+
+  /camera/{id}/stream:
+    x-swagger-router-controller: camera
+    get:
+      operationId: getCameraStream
+      security:
+      - Oauth:
+        - user
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      responses:
+        200:
+          description: ok
+          schema:
+            type: object
+        default:
+          $ref: '#/responses/Error'
+
+  /camera/{id}/{state}:
+    x-swagger-router-controller: camera
+    get:
+      operationId: setCameraState
+      security:
+      - Oauth:
+        - user
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: string
+      - in: path
+        name: state
+        required: true
+        type: string
+        enum: [
+          enable,
+          disable
+        ]
+      responses:
+        200:
+          description: ok
+          schema:
+            type: object
+        default:
+          $ref: '#/responses/Error'
+
+  /swagger:
+    x-swagger-pipe: swagger_raw
+
+responses:
+
+  Error:
+    description: error
+    schema:
+      $ref: '#/definitions/Error'
+
+definitions:
+
+  Error:
+    required:
+    - code
+    - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
+
+
+  Status:
+    type: object
+    additionalProperties: false
+    properties:
+      status:
+        type: string

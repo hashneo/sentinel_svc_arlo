@@ -1,0 +1,23 @@
+FROM node:alpine
+
+#bash is used to run npm test inside the container
+RUN apk update && apk upgrade && apk --update add bash && rm -rf /var/cache/apk/*
+
+WORKDIR /src
+ADD . .
+
+ARG CI_JOB_AUTH
+
+RUN apk add --no-cache --virtual .gyp \
+        go \
+        python \
+        make \
+        g++ \
+        git \
+    && git config --global url.http://${CI_JOB_AUTH}@gitlab.steventaylor.me/.insteadOf http://gitlab.steventaylor.me/ \
+    && npm install \
+    && apk del .gyp
+
+EXPOSE 5000
+
+CMD ["node", "app.js"]

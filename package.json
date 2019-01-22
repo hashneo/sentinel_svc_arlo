@@ -1,0 +1,44 @@
+{
+  "name": "vera",
+  "version": "0.0.1",
+  "private": true,
+  "description": "New Swagger API Project",
+  "keywords": [],
+  "author": "cat",
+  "license": "",
+  "main": "app.js",
+  "dependencies": {
+    "array.prototype.find": "^2.0.4",
+    "body-parser": "^1.18.3",
+    "consul": "^0.34.1",
+    "cookie-parser": "^1.4.3",
+    "deepmerge": "^2.2.1",
+    "eventsource": "^1.0.7",
+    "express": "^4.16.4",
+    "jwt-verifier-client": "^1.0.4",
+    "moment": "^2.22.2",
+    "newrelic": "^4.9.0",
+    "node-cache": "^4.2.0",
+    "q": "^1.5.1",
+    "redis": "^2.8.0",
+    "request": "^2.88.0",
+    "request-debug": "^0.2.0",
+    "sentinel-common": "git+http://gitlab.steventaylor.me/sentinel/common.git",
+    "superagent": "^4.0.0",
+    "superagent-proxy": "^2.0.0",
+    "swagger-express-mw": "^0.7.0",
+    "swagger-tools": "^0.10.4",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "should": "^13.2.3",
+    "supertest": "^3.3.0",
+    "swagger-parser": "^6.0.2"
+  },
+  "scripts": {
+    "test": "mocha -b",
+    "start": "node app.js"
+  }
+}

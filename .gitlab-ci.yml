@@ -1,0 +1,42 @@
+image: docker
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay
+  BUILD_ARCH: "x86_64"
+  REGISTRY_IMAGE: $CI_REGISTRY_IMAGE/$CI_PROJECT_NAME-$BUILD_ARCH
+  KUBECONFIG: /etc/deploy/config
+  CI_DEBUG_TRACE: "false"
+  SERVICE_NAME: sentinel-$CI_PROJECT_NAME
+
+stages:
+  - build
+  - deploy
+
+build_job:
+  stage: build
+  only:
+    - master
+  script:
+    - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN docker.steventaylor.me
+    - docker build --force-rm --no-cache --build-arg CI_JOB_AUTH=gitlab-ci-token:$CI_JOB_TOKEN -t $REGISTRY_IMAGE:$CI_PIPELINE_ID-$CI_COMMIT_SHA -t $REGISTRY_IMAGE:latest -f Dockerfile.$BUILD_ARCH .
+    - docker push $REGISTRY_IMAGE:$CI_PIPELINE_ID-$CI_COMMIT_SHA
+    - docker push $REGISTRY_IMAGE:latest
+    - docker logout docker.steventaylor.me
+    - docker rmi $REGISTRY_IMAGE:$CI_PIPELINE_ID-$CI_COMMIT_SHA $REGISTRY_IMAGE:latest
+
+deploy_job:
+  stage: deploy
+  only:
+    - master
+  before_script:
+    - mkdir -p /etc/deploy
+    - wget -q https://storage.googleapis.com/kubernetes-release/release/$(wget -qO- https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+    - chmod +x ./kubectl
+    - mv ./kubectl /bin/kubectl
+    - echo $KUBE_CONFIG | base64 -d > $KUBECONFIG
+    - kubectl config use-context kubernetes
+  script:
+    - kubectl set image deployment/$SERVICE_NAME $SERVICE_NAME=$REGISTRY_IMAGE:$CI_PIPELINE_ID-$CI_COMMIT_SHA

@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sentinel-liftmaster
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 5000
+    protocol: TCP
+    targetPort: 5000
+  selector:
+    app: liftmaster
+    context: sentinel-services
+    version: v1
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sentinel-liftmaster
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: liftmaster
+        context: sentinel-services
+        version: v1
+    spec:
+      containers:
+        -
+          name: sentinel-liftmaster
+          image: docker.steventaylor.me/sentinel/services/liftmaster/liftmaster-x86_64:latest
+          imagePullPolicy: Always
+          env:
+          - name: PORT
+            value: "5000"
+          - name: CONSUL
+            value: "consul"
+          ports:
+            -
+              containerPort: 5000
+              protocol: TCP
+      imagePullSecrets:
+      - name: regcred
+      nodeSelector:
+          beta.kubernetes.io/arch: amd64
