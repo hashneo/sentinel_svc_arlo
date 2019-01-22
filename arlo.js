@@ -14,6 +14,8 @@ function arlo(config) {
     const redis = require('redis');
     var moment = require('moment');
 
+    const logger = require('sentinel-common').logger;
+
     let pub = redis.createClient(
         {
             host: process.env.REDIS || global.config.redis || '127.0.0.1' ,
@@ -23,7 +25,7 @@ function arlo(config) {
     );
 
     pub.on('end', function(e){
-        console.log('Redis hung up, committing suicide');
+        logger.error('Redis hung up, committing suicide');
         process.exit(1);
     });
 
@@ -55,13 +57,13 @@ function arlo(config) {
 
     deviceCache.on( 'set', function( key, value ){
         let data = JSON.stringify( { module: 'arlo', id : key, value : value });
-        console.log( 'sentinel.device.insert => ' + data );
+        logger.info( 'sentinel.device.insert => ' + data );
         pub.publish( 'sentinel.device.insert', data);
     });
 
     deviceCache.on( 'delete', function( key ){
         let data = JSON.stringify( { module: 'arlo', id : key });
-        console.log( 'sentinel.device.delete => ' + data );
+        logger.info( 'sentinel.device.delete => ' + data );
         pub.publish( 'sentinel.device.delete', data);
     });
 
@@ -202,7 +204,7 @@ function arlo(config) {
 
             es.addEventListener('message', function (e) {
                 subs.call( JSON.parse(e.data));
-                //console.log(e.data)
+                logger.trace(e.data)
             });
 
         });
@@ -278,7 +280,7 @@ function arlo(config) {
             for (var a in headers)
                 headers.hasOwnProperty(a) && (options.headers[a] = headers[a])
 
-            console.log( options.url );
+            logger.info( options.url );
             //console.log( data );
 
             request(options, (err, response, body) => {
@@ -336,7 +338,7 @@ function arlo(config) {
                 }
                 try {
                     if (response.headers['content-type'].indexOf('application/json') != -1) {
-                        console.log( body.toString('utf-8'));
+                        logger.debug( body.toString('utf-8'));
                         body = JSON.parse(body);
 
                         if (!body.success)
@@ -345,7 +347,7 @@ function arlo(config) {
                         body = body.data;
                     }
                 } catch (e) {
-                    console.error(err);
+                    logger.error(err);
                     reject(e);
                     return;
                 }
@@ -640,7 +642,7 @@ function arlo(config) {
     function ping(){
         createSubscription()
             .catch((err)=> {
-                console.log(err);
+                logger.error(err);
             });
     }
 
@@ -662,7 +664,7 @@ function arlo(config) {
                         setTimeout(pollSystem, 10000);
                     })
                     .catch((err) => {
-                        console.error(err);
+                        logger.error(err);
                         process.exit(1);
                         //setTimeout(pollSystem, 60000);
                     });
@@ -673,7 +675,7 @@ function arlo(config) {
 
         })
         .catch((err) => {
-            console.error(err);
+            logger.error(err);
             process.exit(1);
         });
 
