@@ -399,7 +399,7 @@ function arlo(config) {
 
     this.getImage = (id, width, height) => {
         return new Promise( (fulfill, reject) => {
-            reject();
+            fulfill('not implemented');
         });
     };
 
