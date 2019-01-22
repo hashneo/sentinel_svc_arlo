@@ -29,8 +29,6 @@ function arlo(config) {
         process.exit(1);
     });
 
-    const logger = require('sentinel-common').logger;
-
     var NodeCache = require( "node-cache" );
 
     var deviceCache = new NodeCache();
