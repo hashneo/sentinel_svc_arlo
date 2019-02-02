@@ -554,7 +554,7 @@ function arlo(config) {
         return callNotifyAndWait( q );
     }
 
-    function getgGatewayMode(){
+    function getGatewayMode(){
         return call(api.currentMode);
     }
 
@@ -572,7 +572,7 @@ function arlo(config) {
                         statusCache.set(device.serialNumber, values );
                     });
 
-                    return getgGatewayMode();
+                    return getGatewayMode();
                 })
                 .then( (results) => {
 
@@ -663,7 +663,7 @@ function arlo(config) {
                     })
                     .catch((err) => {
                         logger.error(err);
-                        process.exit(1);
+                        //process.exit(1);
                         //setTimeout(pollSystem, 60000);
                     });
 
