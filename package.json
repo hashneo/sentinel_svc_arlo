@@ -23,7 +23,7 @@
     "redis": "^2.8.0",
     "request": "^2.88.0",
     "request-debug": "^0.2.0",
-    "sentinel-common": "git+http://gitlab.steventaylor.me/sentinel/common.git",
+    "sentinel-common": "git+https://github.com/hashneo/sentinel_common.git",
     "superagent": "^4.0.0",
     "superagent-proxy": "^2.0.0",
     "swagger-express-mw": "^0.7.0",
