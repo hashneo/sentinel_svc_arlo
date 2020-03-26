@@ -438,7 +438,7 @@ function arlo(config) {
 
                     let options = {
                         method: 'POST',
-                        url: 'http://home.steventaylor.me/stream/',
+                        url: process.env.STREAM_SERVER_URL,
                         encoding: null,
                         timeout: 30000,
                         json: true,

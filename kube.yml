@@ -11,37 +11,48 @@ spec:
     targetPort: 5000
   selector:
     app: arlo
-    context: sentinel-services
+    context: sentinel
     version: v1
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: sentinel-arlo
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      app: arlo
   template:
     metadata:
       labels:
         app: arlo
-        context: sentinel-services
+        context: sentinel
         version: v1
     spec:
       containers:
+      -
+        name: app
+        image: docker.io/hashneo/sentinel-arlo-x86_64:latest
+        imagePullPolicy: Always
+        env:
+        - name: PORT
+          value: "5000"
+        - name: CONSUL
+          value: "consul"
+        - name: STREAM_SERVER_URL
+          value : ""
+        - name: NEW_RELIC_NO_CONFIG_FILE
+          value: "true"
+        - name: NEW_RELIC_ENABLED
+          value: "true"
+        - name: NEW_RELIC_APP_NAME
+          value: "Sentinel Arlo"
+        - name: NEW_RELIC_LICENSE_KEY
+          value: ""
+        ports:
         -
-          name: sentinel-arlo
-          image: docker.steventaylor.me/sentinel/services/arlo/arlo-x86_64:latest
-          imagePullPolicy: Always
-          env:
-          - name: PORT
-            value: "5000"
-          - name: CONSUL
-            value: "consul"
-          ports:
-            -
-              containerPort: 5000
-              protocol: TCP
-      imagePullSecrets:
-      - name: regcred
+          containerPort: 5000
+          protocol: TCP
       nodeSelector:
-          beta.kubernetes.io/arch: amd64
+        beta.kubernetes.io/arch: amd64

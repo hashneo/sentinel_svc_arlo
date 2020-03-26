@@ -1,8 +1,6 @@
 'use strict';
 
-if (process.env.NEWRELIC_KEY) {
-    require('newrelic');
-}
+require('newrelic');
 
 const SwaggerExpress = require('swagger-express-mw');
 const SwaggerUi = require('swagger-tools/middleware/swagger-ui');

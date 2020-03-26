@@ -1,10 +1,15 @@
-version: 2
+version: 2.1
+
+orbs:
+  kube-orb: circleci/kubernetes@0.11.0
+
 jobs:
   build:
     machine: true
     steps:
 
     - checkout
+
     - run:
         name: Update Environment Variables at Runtime
         command: |
@@ -21,6 +26,18 @@ jobs:
     - run: |
         docker push $DOCKER_ORG/$PROJECT_NAME-x86_64:$CIRCLE_SHA1 &&
         docker push $DOCKER_ORG/$PROJECT_NAME-x86_64:latest
+
+    - kube-orb/install-kubectl
+
+    - kube-orb/install-kubeconfig:
+        kubeconfig: KUBECONFIG_DATA
+
+    - kube-orb/update-container-image:
+        container-image-updates: app=$DOCKER_ORG/$PROJECT_NAME-x86_64:$CIRCLE_SHA1
+        show-kubectl-command: true
+        get-rollout-status: true
+        record: true
+        resource-name: deployment/$DEPLOYMENT_NAME
 
 workflows:
   version: 2
