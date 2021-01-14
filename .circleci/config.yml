@@ -8,40 +8,28 @@ jobs:
     machine: true
     steps:
 
-    - checkout
+      - checkout
 
-    - run:
-        name: Update Environment Variables at Runtime
-        command: |
-          echo 'export PROJECT_NAME=$(echo $CIRCLE_PROJECT_REPONAME | sed "s/_/-/g")' >> $BASH_ENV
-          source $BASH_ENV
-    - run:
-        echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+      - run:
+          name: Update Environment Variables at Runtime
+          command: |
+            echo 'export PROJECT_NAME=$(echo $CIRCLE_PROJECT_REPONAME | sed "s/_/-/g")' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
 
-    # build the application image
-    - run:
-        docker build -t $DOCKER_ORG/$PROJECT_NAME-x86_64:$CIRCLE_SHA1 -t $DOCKER_ORG/$PROJECT_NAME-x86_64:latest . -f Dockerfile.x86_64
+      # build the application image
+      - run:
+          docker build -t $DOCKER_ORG/$PROJECT_NAME-x86_64:$CIRCLE_SHA1 -t $DOCKER_ORG/$PROJECT_NAME-x86_64:latest . -f Dockerfile.x86_64
 
-    # deploy the image
-    - run: |
-        docker push $DOCKER_ORG/$PROJECT_NAME-x86_64:$CIRCLE_SHA1 &&
-        docker push $DOCKER_ORG/$PROJECT_NAME-x86_64:latest
-
-    - kube-orb/install-kubectl
-
-    - kube-orb/install-kubeconfig:
-        kubeconfig: KUBECONFIG_DATA
-
-    - kube-orb/update-container-image:
-        container-image-updates: app=$DOCKER_ORG/$PROJECT_NAME-x86_64:$CIRCLE_SHA1
-        show-kubectl-command: true
-        get-rollout-status: true
-        record: true
-        resource-name: deployment/$DEPLOYMENT_NAME
+      # deploy the image
+      - run: |
+          docker push $DOCKER_ORG/$PROJECT_NAME-x86_64:$CIRCLE_SHA1 &&
+          docker push $DOCKER_ORG/$PROJECT_NAME-x86_64:latest
 
 workflows:
   version: 2
   build-deploy:
     jobs:
-    - build:
-        context: global
+      - build:
+          context: global
