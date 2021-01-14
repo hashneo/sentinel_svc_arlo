@@ -14,7 +14,7 @@
     "cookie-parser": "^1.4.3",
     "deepmerge": "^2.2.1",
     "eventsource": "^1.0.7",
-    "express": "^4.16.4",
+    "express": "^4.17.1",
     "jwt-verifier-client": "^1.0.4",
     "moment": "^2.22.2",
     "newrelic": "^4.9.0",
